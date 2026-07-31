@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ProjectData, AssemblyStep } from '../types';
-import { X, CheckCircle2, Circle, FileText, Layers, ShoppingBag, Download, Copy, Check, Scissors, Lightbulb, ExternalLink } from 'lucide-react';
+import { X, CheckCircle2, Circle, FileText, Layers, ShoppingBag, Download, Copy, Check, Scissors, Lightbulb, ExternalLink, Printer } from 'lucide-react';
 import { playSelectSound, playTickSound } from '../utils/audioSynth';
 
 interface PatternInstructionsModalProps {
@@ -44,6 +44,228 @@ export const PatternInstructionsModal: React.FC<PatternInstructionsModalProps> =
     setCopied(true);
     playSelectSound();
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownloadPrintableDoc = () => {
+    playSelectSound();
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${project.title} - StitchAI Printable Spec Sheet</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #111827;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      background-color: #ffffff;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none; }
+    }
+    .header {
+      border-bottom: 2px solid #000;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .brand {
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #0284c7;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 5px 0 0 0;
+      font-size: 24px;
+      color: #000;
+    }
+    .tagline {
+      font-style: italic;
+      color: #4b5563;
+      margin-top: 4px;
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      background-color: #f9fafb;
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+    .card-value {
+      font-size: 14px;
+      font-weight: bold;
+      color: #111827;
+    }
+    h2 {
+      font-size: 16px;
+      border-bottom: 1px solid #d1d5db;
+      padding-bottom: 6px;
+      margin-top: 25px;
+      margin-bottom: 12px;
+      color: #1f2937;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .step-item {
+      margin-bottom: 15px;
+      padding-left: 10px;
+      border-left: 3px solid #0284c7;
+    }
+    .step-title {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .step-detail {
+      font-size: 13px;
+      color: #374151;
+      margin-top: 2px;
+    }
+    .tip {
+      font-size: 12px;
+      background-color: #f0f9ff;
+      border: 1px solid #bae6fd;
+      padding: 8px;
+      border-radius: 6px;
+      margin-top: 6px;
+      color: #0369a1;
+    }
+    .print-btn {
+      background-color: #0284c7;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="text-align: right; margin-bottom: 15px;">
+    <button onclick="window.print()" class="print-btn">🖨️ Print Document / Save PDF</button>
+  </div>
+
+  <div class="header">
+    <div>
+      <div class="brand">STITCHAI DIGITAL PATTERN ENGINE</div>
+      <h1>${project.title}</h1>
+      <div class="tagline">${project.tagline}</div>
+    </div>
+    <div style="text-align: right; font-size: 12px; color: #6b7280;">
+      <div>Date: ${new Date().toLocaleDateString()}</div>
+      <div>Difficulty: ${project.difficulty.toUpperCase()}</div>
+      <div>Innovation Grade: ${project.innovationGrade} (${project.innovationScore}/100)</div>
+    </div>
+  </div>
+
+  <h2>1. Technical Specifications</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Fabric Type</div>
+      <div class="card-value">${project.fabric.replace('_', ' ').toUpperCase()}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recommended Needle</div>
+      <div class="card-value">${project.patternSpecs.recommendedNeedle}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Seam Allowance</div>
+      <div class="card-value">${project.patternSpecs.seamAllowance}</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Thread Gauge</div>
+      <div class="card-value">${project.patternSpecs.threadGauge}</div>
+    </div>
+  </div>
+
+  ${project.customSeam ? `
+  <h2>2. Custom Seam & Stitch Configuration</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Accent Color</div>
+      <div class="card-value">${project.customSeam.accentName} (${project.customSeam.accentColor})</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Garment Size & Fabric Width</div>
+      <div class="card-value">Size ${project.customSeam.garmentSize} • ${project.customSeam.fabricWidth}" Bolt</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Stitch Style</div>
+      <div class="card-value">${project.customSeam.stitchPattern.replace('_', ' ').toUpperCase()} (${project.customSeam.stitchLength}mm)</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Thread Material</div>
+      <div class="card-value">${project.customSeam.threadType}</div>
+    </div>
+  </div>
+  ` : ''}
+
+  <h2>3. Materials & Hardware Checklist</h2>
+  <ul>
+    ${project.materials.map(m => `<li>${m}</li>`).join('')}
+  </ul>
+
+  <h2>4. Cut Pieces Inventory</h2>
+  <ul>
+    ${project.patternPieces.map(p => `<li><strong>${p.name}:</strong> ${p.dimensions} (Grain: ${p.grainLine})</li>`).join('')}
+  </ul>
+
+  <h2>5. Step-by-Step Construction Instructions</h2>
+  <div>
+    ${project.steps.map(step => `
+      <div class="step-item">
+        <div class="step-title">Step ${step.stepNumber}: ${step.title}</div>
+        <div class="step-detail">${step.detail}</div>
+        ${step.techniqueTip ? `<div class="tip"><strong>Craft Tip:</strong> ${step.techniqueTip}</div>` : ''}
+      </div>
+    `).join('')}
+  </div>
+
+  <footer style="margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 15px; font-size: 11px; color: #9ca3af; text-align: center;">
+    Generated by StitchAI High-Tech Garment Spec Sheet Engine • Keep this document for your sewing workspace.
+  </footer>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${project.title.toLowerCase().replace(/[^a-z0-9]/g, '_')}_spec_sheet.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const toggleLayer = (layerType: string) => {
@@ -381,10 +603,16 @@ export const PatternInstructionsModal: React.FC<PatternInstructionsModalProps> =
         </div>
 
         {/* Modal Footer */}
-        <div className="p-3 border-t border-white/10 bg-black/60 flex items-center justify-between">
-          <span className="text-[10px] font-mono text-slate-400">
-            STITCHAI VECTOR FORMAT .SVG / .PDF
-          </span>
+        <div className="p-3 border-t border-white/10 bg-black/60 flex items-center justify-between gap-2">
+          <button
+            onClick={handleDownloadPrintableDoc}
+            className="py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs tracking-wider flex items-center gap-1.5 transition-all"
+            title="Download formatted printable HTML/PDF spec sheet"
+          >
+            <Printer className="w-3.5 h-3.5 text-[#00F0FF]" />
+            <span className="hidden sm:inline">Printable Doc</span>
+            <span className="sm:hidden">Print</span>
+          </button>
 
           <button
             onClick={() => {

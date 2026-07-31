@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
 import { ProjectData, CommunityPreset } from '../types';
 import { PRESET_PROJECTS, generateDynamicProject } from '../data/presetProjects';
-import { Sparkles, Send, Download, Heart, Zap, Tag, ArrowUpRight, Cpu, BarChart2, ShieldCheck, Leaf } from 'lucide-react';
+import { Sparkles, Send, Download, Heart, Zap, Tag, ArrowUpRight, Cpu, ShieldCheck } from 'lucide-react';
 import { playSelectSound, playSuccessChime } from '../utils/audioSynth';
-import {
-  ResponsiveContainer,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  Tooltip
-} from 'recharts';
+import { D3FabricRadarChart } from './D3FabricRadarChart';
+import { TrendAlertSection } from './TrendAlertSection';
+import { FabricUsageDashboard } from './FabricUsageDashboard';
 
 interface CommunityPromptWorkshopProps {
   onLoadProject: (project: ProjectData) => void;
@@ -255,68 +249,14 @@ export const CommunityPromptWorkshop: React.FC<CommunityPromptWorkshopProps> = (
         </div>
       </div>
 
-      {/* FABRIC POPULARITY & SUSTAINABILITY RADAR CHART */}
-      <div className="bg-black/60 border border-white/10 rounded-2xl p-3.5 space-y-2 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-            <BarChart2 className="w-4 h-4 text-[#00F0FF]" /> Fabric Popularity &amp; Sustainability Radar
-          </div>
-          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 flex items-center gap-1">
-            <Leaf className="w-3 h-3" /> Eco Index
-          </span>
-        </div>
+      {/* TREND ALERT SECTION WITH SEARCH GROUNDING */}
+      <TrendAlertSection onSelectTrendPrompt={(promptText) => setCustomPrompt(promptText)} />
 
-        <p className="text-[11px] text-slate-400 leading-tight">
-          Live generation metrics comparing community demand versus eco-sustainability score:
-        </p>
+      {/* RECHARTS FABRIC USAGE DASHBOARD */}
+      <FabricUsageDashboard />
 
-        {/* Radar Chart Container */}
-        <div className="w-full h-48 my-1 flex justify-center items-center">
-          <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={FABRIC_ANALYTICS_DATA}>
-              <PolarGrid stroke="rgba(255, 255, 255, 0.15)" />
-              <PolarAngleAxis
-                dataKey="fabric"
-                tick={{ fill: '#CBD5E1', fontSize: 9, fontFamily: 'monospace' }}
-              />
-              <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="rgba(255, 255, 255, 0.2)" tick={false} />
-              <Radar
-                name="Popularity Index"
-                dataKey="popularity"
-                stroke="#00F0FF"
-                fill="#00F0FF"
-                fillOpacity={0.35}
-              />
-              <Radar
-                name="Sustainability Score"
-                dataKey="sustainability"
-                stroke="#FF007A"
-                fill="#FF007A"
-                fillOpacity={0.35}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#0F141C',
-                  borderColor: 'rgba(255, 255, 255, 0.2)',
-                  borderRadius: '12px',
-                  fontSize: '11px',
-                  color: '#fff'
-                }}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Chart Legend Badges */}
-        <div className="flex items-center justify-center gap-4 text-[10px] font-mono pt-1 border-t border-white/10">
-          <span className="flex items-center gap-1.5 text-[#00F0FF]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#00F0FF] shadow-[0_0_6px_#00F0FF]" /> Popularity Index
-          </span>
-          <span className="flex items-center gap-1.5 text-[#FF007A]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FF007A] shadow-[0_0_6px_#FF007A]" /> Eco Sustainability
-          </span>
-        </div>
-      </div>
+      {/* D3.JS FABRIC POPULARITY & SUSTAINABILITY RADAR CHART */}
+      <D3FabricRadarChart />
 
       {/* COMMUNITY DESIGN GALLERY */}
       <div className="space-y-3">
