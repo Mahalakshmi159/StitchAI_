@@ -7,10 +7,17 @@ import { IdeaGenerator } from './components/IdeaGenerator';
 import { ResultPreviewCard } from './components/ResultPreviewCard';
 import { PatternInstructionsModal } from './components/PatternInstructionsModal';
 import { SavedProjectsDrawer } from './components/SavedProjectsDrawer';
+import { SeamStitchCustomizer } from './components/SeamStitchCustomizer';
+import { SewingAssistant } from './components/SewingAssistant';
+import { CommunityPromptWorkshop } from './components/CommunityPromptWorkshop';
 import { playSuccessChime, playSelectSound, isAudioEnabled } from './utils/audioSynth';
-import { Sparkles, Bookmark, Zap } from 'lucide-react';
+import { Cpu, Scissors, BookOpen, Users, Zap } from 'lucide-react';
+
+type AppViewMode = 'studio' | 'customizer' | 'assistant' | 'community';
 
 export default function App() {
+  const [activeView, setActiveView] = useState<AppViewMode>('studio');
+
   const [difficultyValue, setDifficultyValue] = useState<number>(2); // 1 = Beginner, 2 = Intermediate, 3 = Master
   const [fabric, setFabric] = useState<FabricType>('techwear');
   const [craftStyle, setCraftStyle] = useState<CraftStyle>('embroidery');
@@ -64,7 +71,7 @@ export default function App() {
         setIsGenerating(false);
         playSuccessChime();
       }
-    }, 450);
+    }, 400);
   };
 
   const handleReset = () => {
@@ -72,6 +79,7 @@ export default function App() {
     setFabric('techwear');
     setCraftStyle('embroidery');
     setCurrentProject(INITIAL_PROJECT);
+    setActiveView('studio');
   };
 
   const handleSaveProject = (project: ProjectData) => {
@@ -97,6 +105,7 @@ export default function App() {
       setFabric(preset.fabric);
       setCraftStyle(preset.craftStyle);
       setCurrentProject(preset);
+      setActiveView('studio');
     }
   };
 
@@ -112,54 +121,148 @@ export default function App() {
         setAudioActive={setAudioActive}
       />
 
-      {/* Quick Preset Shortcuts Bar */}
-      <div className="w-full flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 no-scrollbar text-xs">
-        <span className="text-[10px] font-mono text-slate-400 shrink-0 flex items-center gap-1">
-          <Zap className="w-3 h-3 text-[#00F0FF]" /> PRESETS:
-        </span>
-
+      {/* Main Navigation Tab Bar */}
+      <div className="grid grid-cols-4 bg-black/60 border border-white/10 rounded-2xl p-1 mb-3 text-xs font-semibold">
         <button
-          onClick={() => loadPresetShortcut('denim-upcycling-intermediate')}
-          className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-[#00F0FF] text-slate-300 hover:text-[#00F0FF] shrink-0 text-[11px] font-medium transition-all"
+          onClick={() => {
+            playSelectSound();
+            setActiveView('studio');
+          }}
+          className={`py-2 rounded-xl flex flex-col items-center gap-0.5 transition-all ${
+            activeView === 'studio'
+              ? 'bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]/40 font-bold shadow-[0_0_12px_rgba(0,240,255,0.25)]'
+              : 'text-slate-400 hover:text-white'
+          }`}
         >
-          👖 Selvedge Cyber-Denim
+          <Cpu className="w-3.5 h-3.5" />
+          <span className="text-[10px]">Studio</span>
         </button>
 
         <button
           onClick={() => {
-            setDifficultyValue(3);
-            setFabric('smart_textile');
-            setCraftStyle('quilting');
-            handleGenerateProject();
+            playSelectSound();
+            setActiveView('customizer');
           }}
-          className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-[#FF007A] text-slate-300 hover:text-[#FF007A] shrink-0 text-[11px] font-medium transition-all"
+          className={`py-2 rounded-xl flex flex-col items-center gap-0.5 transition-all ${
+            activeView === 'customizer'
+              ? 'bg-[#FF007A]/20 text-[#FF007A] border border-[#FF007A]/40 font-bold shadow-[0_0_12px_rgba(255,0,122,0.25)]'
+              : 'text-slate-400 hover:text-white'
+          }`}
         >
-          🌟 E-Textile Armor
+          <Scissors className="w-3.5 h-3.5" />
+          <span className="text-[10px]">Custom</span>
+        </button>
+
+        <button
+          onClick={() => {
+            playSelectSound();
+            setActiveView('assistant');
+          }}
+          className={`py-2 rounded-xl flex flex-col items-center gap-0.5 transition-all ${
+            activeView === 'assistant'
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span className="text-[10px]">Guide</span>
+        </button>
+
+        <button
+          onClick={() => {
+            playSelectSound();
+            setActiveView('community');
+          }}
+          className={`py-2 rounded-xl flex flex-col items-center gap-0.5 transition-all ${
+            activeView === 'community'
+              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Users className="w-3.5 h-3.5" />
+          <span className="text-[10px]">AI Studio</span>
         </button>
       </div>
 
-      {/* Main Idea Generator Engine Panel */}
-      <IdeaGenerator
-        difficulty={getDifficultyLevelFromValue(difficultyValue)}
-        difficultyValue={difficultyValue}
-        setDifficultyValue={setDifficultyValue}
-        fabric={fabric}
-        setFabric={setFabric}
-        craftStyle={craftStyle}
-        setCraftStyle={setCraftStyle}
-        onGenerate={handleGenerateProject}
-        isGenerating={isGenerating}
-        generationProgress={generationProgress}
-        generationStageText={generationStageText}
-      />
+      {/* VIEW 1: STUDIO (MAIN ENGINE) */}
+      {activeView === 'studio' && (
+        <div className="space-y-3 animate-in fade-in duration-200">
+          {/* Quick Preset Shortcuts Bar */}
+          <div className="w-full flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+            <span className="text-[10px] font-mono text-slate-400 shrink-0 flex items-center gap-1">
+              <Zap className="w-3 h-3 text-[#00F0FF]" /> PRESETS:
+            </span>
 
-      {/* Result Preview Card */}
-      <ResultPreviewCard
-        project={currentProject}
-        onOpenPatternModal={() => setIsPatternModalOpen(true)}
-        onSaveProject={handleSaveProject}
-        isSaved={isCurrentProjectSaved}
-      />
+            <button
+              onClick={() => loadPresetShortcut('denim-upcycling-intermediate')}
+              className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-[#00F0FF] text-slate-300 hover:text-[#00F0FF] shrink-0 text-[11px] font-medium transition-all"
+            >
+              👖 Selvedge Cyber-Denim
+            </button>
+
+            <button
+              onClick={() => {
+                setDifficultyValue(3);
+                setFabric('smart_textile');
+                setCraftStyle('quilting');
+                handleGenerateProject();
+              }}
+              className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-[#FF007A] text-slate-300 hover:text-[#FF007A] shrink-0 text-[11px] font-medium transition-all"
+            >
+              🌟 E-Textile Armor
+            </button>
+          </div>
+
+          {/* Main Idea Generator Engine Panel */}
+          <IdeaGenerator
+            difficulty={getDifficultyLevelFromValue(difficultyValue)}
+            difficultyValue={difficultyValue}
+            setDifficultyValue={setDifficultyValue}
+            fabric={fabric}
+            setFabric={setFabric}
+            craftStyle={craftStyle}
+            setCraftStyle={setCraftStyle}
+            onGenerate={handleGenerateProject}
+            isGenerating={isGenerating}
+            generationProgress={generationProgress}
+            generationStageText={generationStageText}
+          />
+
+          {/* Result Preview Card */}
+          <ResultPreviewCard
+            project={currentProject}
+            onOpenPatternModal={() => setIsPatternModalOpen(true)}
+            onSaveProject={handleSaveProject}
+            isSaved={isCurrentProjectSaved}
+          />
+        </div>
+      )}
+
+      {/* VIEW 2: SEAM & STITCH CUSTOMIZER */}
+      {activeView === 'customizer' && (
+        <SeamStitchCustomizer
+          project={currentProject}
+          onUpdateProject={(updated) => {
+            setCurrentProject(updated);
+            setActiveView('studio');
+          }}
+        />
+      )}
+
+      {/* VIEW 3: SEWING ASSISTANT & AUDIO GUIDE */}
+      {activeView === 'assistant' && (
+        <SewingAssistant project={currentProject} />
+      )}
+
+      {/* VIEW 4: COMMUNITY & AI PROMPT WORKSHOP */}
+      {activeView === 'community' && (
+        <CommunityPromptWorkshop
+          onLoadProject={(proj) => {
+            setCurrentProject(proj);
+            setActiveView('studio');
+          }}
+        />
+      )}
 
       {/* Interactive Pattern & Instructions Drawer Modal */}
       <PatternInstructionsModal
@@ -173,7 +276,10 @@ export default function App() {
         isOpen={isSavedDrawerOpen}
         onClose={() => setIsSavedDrawerOpen(false)}
         savedProjects={savedProjects}
-        onSelectProject={(proj) => setCurrentProject(proj)}
+        onSelectProject={(proj) => {
+          setCurrentProject(proj);
+          setActiveView('studio');
+        }}
         onRemoveProject={handleRemoveSaved}
       />
     </MobileFrame>

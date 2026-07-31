@@ -30,7 +30,38 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
+export function triggerHapticTick() {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(12);
+    } catch {
+      // Ignore vibration errors
+    }
+  }
+}
+
+export function triggerHapticGenerate() {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate([35, 30, 50, 40, 70]);
+    } catch {
+      // Ignore vibration errors
+    }
+  }
+}
+
+export function triggerHapticSuccess() {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate([20, 40, 30, 50, 80]);
+    } catch {
+      // Ignore vibration errors
+    }
+  }
+}
+
 export function playTickSound() {
+  triggerHapticTick();
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -81,6 +112,7 @@ export function playSelectSound() {
 }
 
 export function playGenerateStartSound() {
+  triggerHapticGenerate();
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -107,6 +139,7 @@ export function playGenerateStartSound() {
 }
 
 export function playSuccessChime() {
+  triggerHapticSuccess();
   const ctx = getAudioContext();
   if (!ctx) return;
 

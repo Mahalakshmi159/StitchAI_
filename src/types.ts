@@ -6,6 +6,20 @@ export type CraftStyle = 'embroidery' | 'quilting' | 'upcycling' | 'patchwork';
 
 export type GarmentType = 'jacket' | 'vest' | 'hoodie' | 'kimono' | 'tote';
 
+export type GarmentSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+
+export type FabricWidth = 44 | 54 | 60;
+
+export interface SeamConfig {
+  accentColor: string; // Hex color code
+  accentName: string;
+  threadType: string;
+  stitchLength: number; // in mm, e.g. 1.0 to 5.0
+  stitchPattern: 'straight' | 'zigzag' | 'cyber_grid' | 'double_topstitch';
+  garmentSize: GarmentSize;
+  fabricWidth: FabricWidth;
+}
+
 export interface VectorLayer {
   id: string;
   name: string;
@@ -55,4 +69,16 @@ export interface ProjectData {
   steps: AssemblyStep[];
   patternPieces: PatternPiece[];
   vectorLayers: VectorLayer[];
+  customSeam?: SeamConfig;
 }
+
+export interface CommunityPreset {
+  id: string;
+  title: string;
+  author: string;
+  downloads: number;
+  likes: number;
+  tags: string[];
+  project: ProjectData;
+}
+
